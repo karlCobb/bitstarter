@@ -26,6 +26,9 @@ var program = require('commander');
 var cheerio = require('cheerio');
 var HTMLFILE_DEFAULT = "index.html";
 var CHECKSFILE_DEFAULT = "checks.json";
+var URL_DEFAULT = "damp-tor-8230.herokuapp.com/";
+var restler = require('restler');
+
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -43,6 +46,8 @@ var cheerioHtmlFile = function(htmlfile) {
 var loadChecks = function(checksfile) {
     return JSON.parse(fs.readFileSync(checksfile));
 };
+
+
 
 var checkHtmlFile = function(htmlfile, checksfile) {
     $ = cheerioHtmlFile(htmlfile);
@@ -65,10 +70,17 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
-        .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
+    .option('-u, --url <url_file>', 'Path to url', clone(assertFileExists), URL_DEFAULT)
+       .parse(process.argv);
+if(program.file)
+    {var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
-} else {
+  console.log(outJson);} 
+else if(program.url)  
+    {restler.get(program.url);
+var checkJson = checkHtmlFile(program.url, program.checks);
+    var outJson = JSON.stringify(checkJson, null, 4); 
+    console.log(outJson);}
+ else {
     exports.checkHtmlFile = checkHtmlFile;
 }
